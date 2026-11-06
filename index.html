@@ -4,25 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy 21st Birthday, My Love 🌻</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --night: #0b0818;
-      --royal: #1c1233;
-      --gold: #f4d03f;
-      --champagne: #fef5d1;
-      --amber: #d4ac0d;
-      --orchid: #e6b3d0;
-      --cream: #f7ecd9;
-      --sun-yellow: #ffdf00;
+      --bg-gradient: linear-gradient(135deg, #f9fbfb 0%, #f0f4f1 50%, #e6efe8 100%);
+      --surface: #ffffff;
+      --card-border: #d4e2d5;
+      --forest: #1b4332;
+      --sage: #2d6a4f;
+      --leaf: #52b788;
+      --gold: #d4af37;
+      --gold-light: #f4d03f;
+      --text-main: #2b3a32;
+      --text-muted: #556b60;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Playfair Display', serif;
-      background: var(--night);
-      color: var(--cream);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
       overflow-x: hidden;
       min-height: 100vh;
     }
@@ -36,14 +38,14 @@
     }
     .heart {
       position: absolute;
-      font-size: 18px;
-      color: rgba(230, 179, 208, 0.25);
-      animation: floatHeart 12s linear infinite;
+      font-size: 16px;
+      color: rgba(82, 183, 136, 0.2);
+      animation: floatHeart 14s linear infinite;
     }
     @keyframes floatHeart {
       0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.4; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.3; }
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
 
@@ -53,9 +55,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(ellipse at center, #241845 0%, #0b0818 70%);
+      background: linear-gradient(135deg, #f4f8f5 0%, #e8f2eb 100%);
       z-index: 100;
-      transition: transform 2s cubic-bezier(0.65, 0, 0.35, 1), opacity 1.4s;
+      transition: transform 1.8s cubic-bezier(0.65, 0, 0.35, 1), opacity 1.2s;
     }
     #capsule-stage.gone {
       transform: translateY(-130vh);
@@ -64,16 +66,17 @@
     }
 
     .capsule {
-      width: 200px;
-      height: 78px;
-      background: linear-gradient(90deg, var(--amber), var(--champagne), var(--amber));
-      border-radius: 50px;
+      width: 210px;
+      height: 76px;
+      background: linear-gradient(90deg, var(--gold), #fff3c4, var(--gold));
+      border-radius: 40px;
       position: relative;
-      box-shadow: 0 0 50px rgba(244, 208, 63, 0.3), 0 0 20px rgba(244, 208, 63, 0.45);
+      box-shadow: 0 15px 35px rgba(45, 106, 79, 0.15), 0 5px 15px rgba(212, 175, 55, 0.3);
       cursor: pointer;
-      transition: transform 0.4s;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(212, 175, 55, 0.5);
     }
-    .capsule:hover { transform: scale(1.07); }
+    .capsule:hover { transform: scale(1.05); }
 
     .capsule::before, .capsule::after {
       content: '';
@@ -84,37 +87,38 @@
       background: inherit;
       transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .capsule::before { left: 0; border-radius: 50px 0 0 50px; }
-    .capsule::after  { right: 0; border-radius: 0 50px 50px 0; }
+    .capsule::before { left: 0; border-radius: 40px 0 0 40px; }
+    .capsule::after  { right: 0; border-radius: 0 40px 40px 0; }
 
     .capsule.burst::before {
-      transform: translateX(-160px) rotate(-30deg);
+      transform: translateX(-160px) rotate(-25deg);
       opacity: 0;
     }
     .capsule.burst::after {
-      transform: translateX(160px) rotate(30deg);
+      transform: translateX(160px) rotate(25deg);
       opacity: 0;
     }
     .capsule.burst {
       background: transparent;
       box-shadow: none;
+      border: none;
     }
 
     .photo-fly {
       position: absolute;
       object-fit: cover;
-      border-radius: 14px;
-      border: 3px solid var(--gold);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 10px 30px rgba(27, 67, 50, 0.2);
       opacity: 0;
       pointer-events: none;
-      transition: all 1.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .mini-heart {
       position: absolute;
       font-size: 16px;
-      color: var(--gold);
+      color: var(--sage);
       opacity: 0;
       pointer-events: none;
     }
@@ -122,15 +126,15 @@
     #main {
       min-height: 100vh;
       padding: 60px 24px 120px;
-      background: linear-gradient(to bottom, #0b0818, #1c1233);
+      background: var(--bg-gradient);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
       opacity: 0;
-      transform: translateY(80px);
-      transition: opacity 1.8s 0.3s, transform 1.8s 0.3s;
+      transform: translateY(40px);
+      transition: opacity 1.5s 0.2s, transform 1.5s 0.2s;
       position: relative;
       z-index: 10;
     }
@@ -140,64 +144,73 @@
     }
 
     .sun-top {
-      font-size: 2.5rem;
-      margin-bottom: 0.4rem;
-      filter: drop-shadow(0 0 16px rgba(244, 208, 63, 0.7));
+      font-size: 2.2rem;
+      margin-bottom: 0.6rem;
+      filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.3));
     }
 
     .script {
-      font-family: 'Great Vibes', cursive;
-      font-size: clamp(2.8rem, 9vw, 4.5rem);
-      color: var(--gold);
-      margin-bottom: 0.6rem;
-      text-shadow: 0 0 30px rgba(244, 208, 63, 0.35);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--forest);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.5px;
     }
 
     h1 {
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
       font-weight: 500;
-      letter-spacing: 3px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
       margin-bottom: 2rem;
-      color: var(--champagne);
+      color: var(--sage);
     }
 
     .tribute {
-      max-width: 580px;
-      font-size: 1.2rem;
-      line-height: 1.85;
-      margin-bottom: 1.4rem;
-      color: var(--cream);
-      opacity: 0.95;
+      max-width: 540px;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      background: var(--surface);
+      padding: 28px 32px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 30px rgba(45, 106, 79, 0.05);
     }
 
     .sun-divider {
-      font-size: 1.4rem;
-      letter-spacing: 14px;
+      font-size: 1.1rem;
+      letter-spacing: 12px;
       color: var(--gold);
-      margin: 0.4rem 0 0.8rem;
+      margin: 0.2rem 0 1rem;
     }
 
     .quote {
-      font-family: 'Great Vibes', cursive;
-      font-size: 1.7rem;
-      color: var(--gold);
-      margin: 1.2rem 0 3rem;
-      opacity: 0.95;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--forest);
+      margin: 1rem 0 2.5rem;
+      opacity: 0.9;
     }
 
     .locket-container {
       position: relative;
-      width: 170px;
-      height: 170px;
+      width: 150px;
+      height: 150px;
       cursor: pointer;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
     }
     .locket {
       width: 100%;
       height: 100%;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .locket.open { transform: rotateY(180deg); }
 
@@ -210,22 +223,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      box-shadow: 0 15px 35px rgba(27, 67, 50, 0.12);
     }
     .locket-front {
-      background: radial-gradient(circle at 30% 25%, #fff9e6, var(--gold) 60%, #9a7610);
-      border: 7px solid var(--amber);
-      font-size: 3.5rem;
-      animation: pulse 2.5s ease-in-out infinite;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #f0f7f2 60%, #c9decf);
+      border: 5px solid var(--gold);
+      font-size: 3rem;
+      transition: transform 0.3s;
     }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 208, 63, 0.4); }
-      50% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(244, 208, 63, 0); }
-    }
+    .locket-front:hover { transform: scale(1.04); }
     .locket-back {
-      background: var(--royal);
+      background: var(--surface);
       transform: rotateY(180deg);
-      border: 7px solid var(--amber);
+      border: 5px solid var(--gold);
       overflow: hidden;
     }
     .locket-back img {
@@ -235,56 +245,61 @@
     }
 
     .click-hint {
-      margin-top: 1.4rem;
-      font-size: 0.95rem;
-      letter-spacing: 2px;
-      color: var(--gold);
-      opacity: 0.85;
+      margin-top: 1.2rem;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--sage);
+      font-weight: 500;
     }
 
-    /* ===== Embedded Music Player Container ===== */
+    /* ===== Professional Clean Player ===== */
     .player {
       position: fixed;
-      bottom: 18px;
-      right: 18px;
-      max-width: calc(100vw - 36px);
+      bottom: 20px;
+      right: 20px;
+      max-width: calc(100vw - 40px);
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 40px;
-      background: rgba(28, 18, 51, 0.9);
-      border: 1px solid var(--gold);
-      backdrop-filter: blur(10px);
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
       z-index: 300;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(27, 67, 50, 0.08);
     }
     .player button {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
       border-radius: 50%;
-      background: rgba(244, 208, 63, 0.2);
-      border: 1px solid var(--gold);
-      color: var(--champagne);
-      font-size: 1rem;
+      background: #f0f7f2;
+      border: 1px solid var(--card-border);
+      color: var(--forest);
+      font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .player button:hover { background: rgba(244, 208, 63, 0.4); }
-    #musicBtn { width: 46px; height: 46px; font-size: 1.15rem; background: rgba(244, 208, 63, 0.3); }
+    .player button:hover { background: var(--sage); color: #fff; }
+    #musicBtn { width: 42px; height: 42px; background: var(--forest); color: #fff; border: none; font-size: 1rem; }
+    #musicBtn:hover { background: var(--sage); }
     .track-name {
-      max-width: 140px;
+      max-width: 150px;
       font-size: 0.75rem;
-      letter-spacing: 0.5px;
-      color: var(--champagne);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      color: var(--forest);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      padding: 0 6px;
+      padding: 0 4px;
     }
 
-    /* Hidden wrapper frame for safe legal embeds */
     #embed-container {
       position: absolute;
       width: 0;
@@ -297,14 +312,15 @@
     #video-modal {
       position: fixed;
       inset: 0;
-      background: rgba(8, 6, 16, 0.94);
+      background: rgba(27, 67, 50, 0.85);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 200;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s;
+      transition: opacity 0.4s;
     }
     #video-modal.open {
       opacity: 1;
@@ -313,18 +329,18 @@
     .video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-      max-width: 980px;
+      gap: 20px;
+      max-width: 960px;
       max-height: 82vh;
       overflow-y: auto;
       padding: 20px;
     }
     .video-item {
-      background: var(--royal);
-      border-radius: 18px;
+      background: var(--surface);
+      border-radius: 14px;
       overflow: hidden;
-      border: 2px solid var(--gold);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
     .video-item video {
       width: 100%;
@@ -334,14 +350,16 @@
     }
     .close-btn {
       position: absolute;
-      top: 22px;
-      right: 28px;
-      font-size: 2.8rem;
-      color: var(--gold);
+      top: 24px;
+      right: 32px;
+      font-size: 2.5rem;
+      color: #ffffff;
       background: none;
       border: none;
       cursor: pointer;
+      transition: transform 0.2s;
     }
+    .close-btn:hover { transform: scale(1.1); }
   </style>
 </head>
 <body>
@@ -354,22 +372,19 @@
 
   <section id="main">
     <div class="sun-top">🌻</div>
-    <div class="script">Happy 21st Birthday, My Love 🌻</div>
-    <h1>Saving the Memories of Your Wonderful Day ✨</h1>
+    <div class="script">Happy 21st Birthday, My Love</div>
+    <h1>Memories & Wishes Preserved Forever</h1>
 
-    <p class="tribute">
-      Some days deserve to be kept forever, 🎂<br>
-      and the day you were born into this world is one of them. 🌻<br><br>
-
-      Your 21st year begins today, and every smile, every laugh, every little moment with you ✨<br>
-      is a treasure I never want to lose. 💛<br>
-      So I folded them all into this little capsule,<br>
-      just for you. 🎁🌻
-    </p>
+    <div class="tribute">
+      Your 21st year begins today, 🌻<br>
+      surrounded by all the love, smiles, and wishes from those who cherish you most. ✨<br>
+      I’ve kept every single word and memory right here inside this capsule—<br>
+      yours to open, relive, and hold onto forever. 💛🎁
+    </div>
 
     <div class="sun-divider">🌻 🌻 🌻</div>
 
-    <div class="quote">“May every year bring you<br>as much joy as you bring me.” 🌻</div>
+    <div class="quote">“May every year bring you as much joy as you bring me.”</div>
 
     <div class="locket-container" id="locket">
       <div class="locket" id="locket-inner">
@@ -379,11 +394,11 @@
         </div>
       </div>
     </div>
-    <p class="click-hint">Open the locket for more memories 💌</p>
+    <p class="click-hint">Open the locket for video messages 💌</p>
   </section>
 
   <div id="video-modal">
-    <button class="close-btn" id="close-modal">×</button>
+    <button class="close-btn" id="close-modal">&times;</button>
     <div class="video-grid">
       <div class="video-item">
         <video controls poster="photos/1.jpg">
@@ -415,17 +430,16 @@
 
   <!-- Music Player Interface -->
   <div class="player" id="player">
-    <button id="prevBtn" aria-label="Previous song">⏮</button>
-    <button id="musicBtn" aria-label="Play or pause">▶</button>
-    <button id="nextBtn" aria-label="Next song">⏭</button>
+    <button id="prevBtn" aria-label="Previous song">&#9664;&#9664;</button>
+    <button id="musicBtn" aria-label="Play or pause">&#9658;</button>
+    <button id="nextBtn" aria-label="Next song">&#9654;&#9654;</button>
     <span class="track-name" id="trackName"></span>
   </div>
 
-  <!-- Hidden Embed Container for Legal Audio Streaming Frames -->
   <div id="embed-container"></div>
 
   <script>
-    // Floating hearts and sunflowers background stickers
+    // Floating botanical hearts and sunflowers
     const heartsContainer = document.getElementById('hearts');
     for (let i = 0; i < 22; i++) {
       const item = document.createElement('div');
@@ -433,9 +447,9 @@
       const isSun = i % 3 === 0;
       item.innerHTML = isSun ? '🌻' : '♥';
       item.style.left = Math.random() * 100 + 'vw';
-      item.style.animationDuration = (9 + Math.random() * 10) + 's';
+      item.style.animationDuration = (10 + Math.random() * 10) + 's';
       item.style.animationDelay = (Math.random() * 8) + 's';
-      item.style.fontSize = (isSun ? 20 + Math.random() * 12 : 14 + Math.random() * 16) + 'px';
+      item.style.fontSize = (isSun ? 18 + Math.random() * 10 : 13 + Math.random() * 12) + 'px';
       heartsContainer.appendChild(item);
     }
 
@@ -452,12 +466,12 @@
     const trackName = document.getElementById('trackName');
     const embedContainer = document.getElementById('embed-container');
 
-    // === LEGAL EMBED PLAYLIST (All 5 requested songs) ===
+    // === 5-SONG PLAYLIST (Legal Direct Embed Streams) ===
     const tracks = [
       { title: 'White Keys - Dominic Fike', embedUrl: 'https://www.youtube.com/embed/xBOcSuou3uw?enablejsapi=1&autoplay=1' },
       { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://www.youtube.com/embed/d--DyK0wtYo?enablejsapi=1&autoplay=1' },
       { title: 'Running - Lasmid', embedUrl: 'https://www.youtube.com/embed/SkSqhH2u6Yg?enablejsapi=1&autoplay=1' },
-      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/videoseries?list=PL_authorized_james_varrick_mix&enablejsapi=1&autoplay=1' },
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/aQg5qyVky9U?enablejsapi=1&autoplay=1' },
       { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&autoplay=1' }
     ];
 
@@ -515,8 +529,8 @@
       'photos/10.jpg'
     ];
 
-    const baseSize = 130;
-    const size = Math.max(70, baseSize - (photos.length * 4.5));
+    const baseSize = 120;
+    const size = Math.max(70, baseSize - (photos.length * 4));
 
     photos.forEach((src, i) => {
       const img = document.createElement('img');
@@ -533,20 +547,19 @@
       capsule.classList.add('burst');
 
       const flyPhotos = document.querySelectorAll('.photo-fly');
-      flyPhotos.setItem = true;
       flyPhotos.forEach((img, i) => {
         const angle = (i / flyPhotos.length) * Math.PI * 2;
-        const distance = 200 + Math.random() * 140;
+        const distance = 180 + Math.random() * 120;
         const x = Math.cos(angle) * distance;
-        const y = Math.sin(angle) * distance - 30;
+        const y = Math.sin(angle) * distance - 25;
 
         setTimeout(() => {
           img.style.opacity = '1';
-          img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${Math.random()*50-25}deg)`;
-        }, 180 + i * 50);
+          img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${Math.random()*40-20}deg)`;
+        }, 150 + i * 40);
       });
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 18; i++) {
         const h = document.createElement('div');
         h.className = 'mini-heart';
         h.innerHTML = i % 3 === 0 ? '🌻' : '♥';
@@ -555,35 +568,35 @@
         stage.appendChild(h);
 
         const angle = Math.random() * Math.PI * 2;
-        const dist = 120 + Math.random() * 180;
+        const dist = 100 + Math.random() * 160;
         setTimeout(() => {
-          h.style.transition = 'all 1.4s ease-out';
+          h.style.transition = 'all 1.2s ease-out';
           h.style.opacity = '0.9';
-          h.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px)) scale(1.3)`;
-        }, 100);
-        setTimeout(() => h.style.opacity = '0', 1400);
+          h.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px)) scale(1.2)`;
+        }, 80);
+        setTimeout(() => h.style.opacity = '0', 1200);
       }
 
       setTimeout(() => {
         stage.classList.add('gone');
         main.classList.add('visible');
-      }, 1750);
+      }, 1500);
     });
 
     locket.addEventListener('click', () => {
       locketInner.classList.add('open');
-      setTimeout(() => modal.classList.add('open'), 600);
+      setTimeout(() => modal.classList.add('open'), 500);
     });
 
     closeBtn.addEventListener('click', () => {
       modal.classList.remove('open');
-      setTimeout(() => locketInner.classList.remove('open'), 400);
+      setTimeout(() => locketInner.classList.remove('open'), 350);
     });
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.classList.remove('open');
-        setTimeout(() => locketInner.classList.remove('open'), 400);
+        setTimeout(() => locketInner.classList.remove('open'), 350);
       }
     });
   </script>
