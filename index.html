@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For You, My Love</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Playfair Display', serif;
+      background: #0c0a09;
+      color: #f8e9d8;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Floating hearts background */
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .heart {
+      position: absolute;
+      font-size: 18px;
+      color: rgba(232, 180, 184, 0.25);
+      animation: floatHeart 12s linear infinite;
+    }
+    @keyframes floatHeart {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ========== CAPSULE STAGE ========== */
+    #capsule-stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a1210 0%, #0c0a09 70%);
+      z-index: 100;
+      transition: transform 2s cubic-bezier(0.65, 0, 0.35, 1), opacity 1.4s;
+    }
+    #capsule-stage.gone {
+      transform: translateY(-130vh);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .capsule {
+      width: 200px;
+      height: 78px;
+      background: linear-gradient(90deg, #c9a86c, #f0d78c, #c9a86c);
+      border-radius: 50px;
+      position: relative;
+      box-shadow: 0 0 50px rgba(232, 180, 184, 0.4), 0 0 20px rgba(201, 168, 108, 0.6);
+      cursor: pointer;
+      transition: transform 0.4s;
+    }
+    .capsule:hover { transform: scale(1.07); }
+
+    .capsule::before, .capsule::after {
+      content: '';
+      position: absolute;
+      width: 50%;
+      height: 100%;
+      top: 0;
+      background: inherit;
+      transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .capsule::before { left: 0; border-radius: 50px 0 0 50px; }
+    .capsule::after  { right: 0; border-radius: 0 50px 50px 0; }
+
+    .capsule.burst::before {
+      transform: translateX(-160px) rotate(-30deg);
+      opacity: 0;
+    }
+    .capsule.burst::after {
+      transform: translateX(160px) rotate(30deg);
+      opacity: 0;
+    }
+    .capsule.burst {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* Flying photos */
+    .photo-fly {
+      position: absolute;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 3px solid #f0d78c;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 1.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Tiny heart particles */
+    .mini-heart {
+      position: absolute;
+      font-size: 16px;
+      color: #e8b4b8;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ========== MAIN PAGE ========== */
+    #main {
+      min-height: 100vh;
+      padding: 60px 24px 100px;
+      background: linear-gradient(to bottom, #0c0a09, #1a1210);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(80px);
+      transition: opacity 1.8s 0.3s, transform 1.8s 0.3s;
+      position: relative;
+      z-index: 10;
+    }
+    #main.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .script {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(2.8rem, 9vw, 4.5rem);
+      color: #e8b4b8;
+      margin-bottom: 0.6rem;
+      text-shadow: 0 0 30px rgba(232, 180, 184, 0.4);
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 500;
+      letter-spacing: 3px;
+      margin-bottom: 2rem;
+      color: #f0d78c;
+    }
+
+    .tribute {
+      max-width: 580px;
+      font-size: 1.2rem;
+      line-height: 1.85;
+      margin-bottom: 1.8rem;
+      color: #f5e6d3;
+      opacity: 0.95;
+    }
+
+    .quote {
+      font-family: 'Great Vibes', cursive;
+      font-size: 1.7rem;
+      color: #e8b4b8;
+      margin: 2rem 0 3rem;
+      opacity: 0.9;
+    }
+
+    /* Locket */
+    .locket-container {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .locket {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .locket.open { transform: rotateY(180deg); }
+
+    .locket-front, .locket-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .locket-front {
+      background: radial-gradient(circle at 30% 25%, #f8e9d8, #c9a86c 60%, #8b6914);
+      border: 7px solid #a67c00;
+      font-size: 4rem;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 180, 184, 0.4); }
+      50% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(232, 180, 184, 0); }
+    }
+    .locket-back {
+      background: #1a1210;
+      transform: rotateY(180deg);
+      border: 7px solid #a67c00;
+      overflow: hidden;
+    }
+    .locket-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .click-hint {
+      margin-top: 1.4rem;
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+      color: #e8b4b8;
+      opacity: 0.7;
+    }
+
+    /* Music button */
+    .music-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(201, 168, 108, 0.2);
+      border: 1px solid #c9a86c;
+      color: #f0d78c;
+      font-size: 1.4rem;
+      cursor: pointer;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s;
+    }
+    .music-btn:hover { background: rgba(201, 168, 108, 0.35); }
+
+    /* Video Modal */
+    #video-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 6, 5, 0.94);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    #video-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+      max-width: 980px;
+      max-height: 82vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .video-item {
+      background: #1a1210;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid #c9a86c;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+    .video-item video {
+      width: 100%;
+      display: block;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    .close-btn {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      font-size: 2.8rem;
+      color: #e8b4b8;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating hearts -->
+  <div class="hearts" id="hearts"></div>
+
+  <!-- CAPSULE STAGE -->
+  <div id="capsule-stage">
+    <div class="capsule" id="capsule"></div>
+  </div>
+
+  <!-- MAIN TRIBUTE -->
+  <section id="main">
+    <div class="script">My Dearest</div>
+    <h1>You Are My Favourite Place</h1>
+    
+    <p class="tribute">
+      In a world full of temporary things,<br>
+      you are my permanent peace.<br><br>
+      
+      Your smile is the first place my heart feels at home.<br>
+      Your laugh is the sound I want to hear for the rest of my life.<br>
+      And your love… is the safest thing I have ever known.
+    </p>
+
+    <div class="quote">“I love you more than yesterday,<br>but less than tomorrow.”</div>
+
+    <div class="locket-container" id="locket">
+      <div class="locket" id="locket-inner">
+        <div class="locket-front">❤️</div>
+        <div class="locket-back">
+          <img src="photos/1.jpg" alt="us">
+        </div>
+      </div>
+    </div>
+    <p class="click-hint">Open the locket</p>
+  </section>
+
+  <!-- VIDEO MODAL -->
+  <div id="video-modal">
+    <button class="close-btn" id="close-modal">×</button>
+    <div class="video-grid">
+      <div class="video-item">
+        <video controls poster="photos/1.jpg">
+          <source src="videos/1.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="video-item">
+        <video controls poster="photos/2.jpg">
+          <source src="videos/2.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="video-item">
+        <video controls poster="photos/3.jpg">
+          <source src="videos/3.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <!-- Music button -->
+  <button class="music-btn" id="musicBtn">♪</button>
+  <audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <!-- Replace with a soft romantic track if you want -->
+  </audio>
+
+  <script>
+    // Create floating background hearts
+    const heartsContainer = document.getElementById('hearts');
+    for (let i = 0; i < 18; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = '♥';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (9 + Math.random() * 10) + 's';
+      heart.style.animationDelay = (Math.random() * 8) + 's';
+      heart.style.fontSize = (14 + Math.random() * 16) + 'px';
+      heartsContainer.appendChild(heart);
+    }
+
+    const capsule = document.getElementById('capsule');
+    const stage = document.getElementById('capsule-stage');
+    const main = document.getElementById('main');
+    const locket = document.getElementById('locket');
+    const locketInner = document.getElementById('locket-inner');
+    const modal = document.getElementById('video-modal');
+    const closeBtn = document.getElementById('close-modal');
+    const musicBtn = document.getElementById('musicBtn');
+    const bgMusic = document.getElementById('bgMusic');
+
+    // === PHOTOS - automatically resize based on count ===
+    const photos = [
+      'photos/1.jpg',
+      'photos/2.jpg',
+      'photos/3.jpg',
+      'photos/4.jpg',
+      'photos/5.jpg',
+      'photos/6.jpg',
+      'photos/7.jpg',
+      'photos/8.jpg'
+      // Add as many as you want - they will resize automatically
+    ];
+
+    const baseSize = 130;
+    const size = Math.max(70, baseSize - (photos.length * 4.5)); // shrinks when more photos
+
+    photos.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'photo-fly';
+      img.style.width = size + 'px';
+      img.style.height = (size * 1.25) + 'px';
+      img.style.left = '50%';
+      img.style.top = '50%';
+      stage.appendChild(img);
+    });
+
+    // Burst animation
+    capsule.addEventListener('click', () => {
+      capsule.classList.add('burst');
+
+      const flyPhotos = document.querySelectorAll('.photo-fly');
+      flyPhotos.forEach((img, i) => {
+        const angle = (i / flyPhotos.length) * Math.PI * 2;
+        const distance = 200 + Math.random() * 140;
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance - 30;
+
+        setTimeout(() => {
+          img.style.opacity = '1';
+          img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${Math.random()*50-25}deg)`;
+        }, 180 + i * 50);
+      });
+
+      // Extra romantic heart particles
+      for (let i = 0; i < 20; i++) {
+        const h = document.createElement('div');
+        h.className = 'mini-heart';
+        h.innerHTML = '♥';
+        h.style.left = '50%';
+        h.style.top = '50%';
+        stage.appendChild(h);
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 120 + Math.random() * 180;
+        setTimeout(() => {
+          h.style.transition = 'all 1.4s ease-out';
+          h.style.opacity = '0.9';
+          h.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px)) scale(1.3)`;
+        }, 100);
+        setTimeout(() => h.style.opacity = '0', 1400);
+      }
+
+      setTimeout(() => {
+        stage.classList.add('gone');
+        main.classList.add('visible');
+      }, 1750);
+    });
+
+    // Locket
+    locket.addEventListener('click', () => {
+      locketInner.classList.add('open');
+      setTimeout(() => modal.classList.add('open'), 600);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('open');
+      setTimeout(() => locketInner.classList.remove('open'), 400);
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('open');
+        setTimeout(() => locketInner.classList.remove('open'), 400);
+      }
+    });
+
+    // Music toggle
+    let isPlaying = false;
+    musicBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicBtn.textContent = '♪';
+      } else {
+        bgMusic.play();
+        musicBtn.textContent = '❚❚';
+      }
+      isPlaying = !isPlaying;
+    });
+  </script>
+</body>
+  </html>
