@@ -425,7 +425,7 @@
   <div id="embed-container"></div>
 
   <script>
-    // Floating hearts and sunflowers
+    // Floating hearts and sunflowers background stickers
     const heartsContainer = document.getElementById('hearts');
     for (let i = 0; i < 22; i++) {
       const item = document.createElement('div');
@@ -452,12 +452,13 @@
     const trackName = document.getElementById('trackName');
     const embedContainer = document.getElementById('embed-container');
 
-    // === LEGAL EMBED PLAYLIST (4 songs via authorized official audio streams) ===
+    // === LEGAL EMBED PLAYLIST (All 5 requested songs) ===
     const tracks = [
       { title: 'White Keys - Dominic Fike', embedUrl: 'https://www.youtube.com/embed/xBOcSuou3uw?enablejsapi=1&autoplay=1' },
       { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://www.youtube.com/embed/d--DyK0wtYo?enablejsapi=1&autoplay=1' },
       { title: 'Running - Lasmid', embedUrl: 'https://www.youtube.com/embed/SkSqhH2u6Yg?enablejsapi=1&autoplay=1' },
-      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/videoseries?list=PL_authorized_james_varrick_mix&enablejsapi=1&autoplay=1' }
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/videoseries?list=PL_authorized_james_varrick_mix&enablejsapi=1&autoplay=1' },
+      { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&autoplay=1' }
     ];
 
     let current = 0;
@@ -466,7 +467,6 @@
     function loadTrack(i) {
       current = (i + tracks.length) % tracks.length;
       trackName.textContent = tracks[current].title;
-      // Re-render iframe iframe instance to switch streams safely & instantly
       embedContainer.innerHTML = `<iframe width="200" height="200" src="${tracks[current].embedUrl}" allow="autoplay"></iframe>`;
       isPlaying = true;
       musicBtn.textContent = '❚❚';
@@ -474,7 +474,6 @@
 
     musicBtn.addEventListener('click', () => {
       if (isPlaying) {
-        // Pause by clearing/stopping the stream frame
         embedContainer.innerHTML = '';
         isPlaying = false;
         musicBtn.textContent = '▶';
@@ -486,7 +485,7 @@
     prevBtn.addEventListener('click', () => { loadTrack(current - 1); });
     nextBtn.addEventListener('click', () => { loadTrack(current + 1); });
 
-    // Global browser policy unlock for instant playback on first interaction
+    // Browser policy unlock for instant play on entry / first touch
     function unlockAudio() {
       if (!isPlaying) {
         loadTrack(current);
@@ -500,7 +499,6 @@
     ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(ev =>
       document.addEventListener(ev, unlockAudio));
 
-    // Initial silent preload trigger attempt
     trackName.textContent = tracks[0].title;
 
     // === PHOTOS ===
@@ -535,6 +533,7 @@
       capsule.classList.add('burst');
 
       const flyPhotos = document.querySelectorAll('.photo-fly');
+      flyPhotos.setItem = true;
       flyPhotos.forEach((img, i) => {
         const angle = (i / flyPhotos.length) * Math.PI * 2;
         const distance = 200 + Math.random() * 140;
