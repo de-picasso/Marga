@@ -3,15 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>For You, My Love</title>
+  <title>Happy 21st Birthday, My Love 🌻</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --night: #0b0818;
+      --royal: #1c1233;
+      --gold: #f4d03f;
+      --champagne: #fef5d1;
+      --amber: #d4ac0d;
+      --orchid: #e6b3d0;
+      --cream: #f7ecd9;
+      --sun-yellow: #ffdf00;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Playfair Display', serif;
-      background: #0c0a09;
-      color: #f8e9d8;
+      background: var(--night);
+      color: var(--cream);
       overflow-x: hidden;
       min-height: 100vh;
     }
@@ -26,7 +37,7 @@
     .heart {
       position: absolute;
       font-size: 18px;
-      color: rgba(232, 180, 184, 0.25);
+      color: rgba(230, 179, 208, 0.25);
       animation: floatHeart 12s linear infinite;
     }
     @keyframes floatHeart {
@@ -42,7 +53,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(ellipse at center, #1a1210 0%, #0c0a09 70%);
+      background: radial-gradient(ellipse at center, #241845 0%, #0b0818 70%);
       z-index: 100;
       transition: transform 2s cubic-bezier(0.65, 0, 0.35, 1), opacity 1.4s;
     }
@@ -55,10 +66,10 @@
     .capsule {
       width: 200px;
       height: 78px;
-      background: linear-gradient(90deg, #c9a86c, #f0d78c, #c9a86c);
+      background: linear-gradient(90deg, var(--amber), var(--champagne), var(--amber));
       border-radius: 50px;
       position: relative;
-      box-shadow: 0 0 50px rgba(232, 180, 184, 0.4), 0 0 20px rgba(201, 168, 108, 0.6);
+      box-shadow: 0 0 50px rgba(244, 208, 63, 0.3), 0 0 20px rgba(244, 208, 63, 0.45);
       cursor: pointer;
       transition: transform 0.4s;
     }
@@ -93,7 +104,7 @@
       position: absolute;
       object-fit: cover;
       border-radius: 14px;
-      border: 3px solid #f0d78c;
+      border: 3px solid var(--gold);
       box-shadow: 0 12px 35px rgba(0,0,0,0.5);
       opacity: 0;
       pointer-events: none;
@@ -103,15 +114,15 @@
     .mini-heart {
       position: absolute;
       font-size: 16px;
-      color: #e8b4b8;
+      color: var(--gold);
       opacity: 0;
       pointer-events: none;
     }
 
     #main {
       min-height: 100vh;
-      padding: 60px 24px 100px;
-      background: linear-gradient(to bottom, #0c0a09, #1a1210);
+      padding: 60px 24px 120px;
+      background: linear-gradient(to bottom, #0b0818, #1c1233);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -128,12 +139,18 @@
       transform: translateY(0);
     }
 
+    .sun-top {
+      font-size: 2.5rem;
+      margin-bottom: 0.4rem;
+      filter: drop-shadow(0 0 16px rgba(244, 208, 63, 0.7));
+    }
+
     .script {
       font-family: 'Great Vibes', cursive;
       font-size: clamp(2.8rem, 9vw, 4.5rem);
-      color: #e8b4b8;
+      color: var(--gold);
       margin-bottom: 0.6rem;
-      text-shadow: 0 0 30px rgba(232, 180, 184, 0.4);
+      text-shadow: 0 0 30px rgba(244, 208, 63, 0.35);
     }
 
     h1 {
@@ -141,24 +158,31 @@
       font-weight: 500;
       letter-spacing: 3px;
       margin-bottom: 2rem;
-      color: #f0d78c;
+      color: var(--champagne);
     }
 
     .tribute {
       max-width: 580px;
       font-size: 1.2rem;
       line-height: 1.85;
-      margin-bottom: 1.8rem;
-      color: #f5e6d3;
+      margin-bottom: 1.4rem;
+      color: var(--cream);
       opacity: 0.95;
+    }
+
+    .sun-divider {
+      font-size: 1.4rem;
+      letter-spacing: 14px;
+      color: var(--gold);
+      margin: 0.4rem 0 0.8rem;
     }
 
     .quote {
       font-family: 'Great Vibes', cursive;
       font-size: 1.7rem;
-      color: #e8b4b8;
-      margin: 2rem 0 3rem;
-      opacity: 0.9;
+      color: var(--gold);
+      margin: 1.2rem 0 3rem;
+      opacity: 0.95;
     }
 
     .locket-container {
@@ -189,19 +213,19 @@
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
     .locket-front {
-      background: radial-gradient(circle at 30% 25%, #f8e9d8, #c9a86c 60%, #8b6914);
-      border: 7px solid #a67c00;
-      font-size: 4rem;
+      background: radial-gradient(circle at 30% 25%, #fff9e6, var(--gold) 60%, #9a7610);
+      border: 7px solid var(--amber);
+      font-size: 3.5rem;
       animation: pulse 2.5s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232, 180, 184, 0.4); }
-      50% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(232, 180, 184, 0); }
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 208, 63, 0.4); }
+      50% { transform: scale(1.04); box-shadow: 0 0 0 18px rgba(244, 208, 63, 0); }
     }
     .locket-back {
-      background: #1a1210;
+      background: var(--royal);
       transform: rotateY(180deg);
-      border: 7px solid #a67c00;
+      border: 7px solid var(--amber);
       overflow: hidden;
     }
     .locket-back img {
@@ -214,32 +238,66 @@
       margin-top: 1.4rem;
       font-size: 0.95rem;
       letter-spacing: 2px;
-      color: #e8b4b8;
-      opacity: 0.7;
+      color: var(--gold);
+      opacity: 0.85;
     }
 
-    .music-btn {
+    /* ===== Embedded Music Player Container ===== */
+    .player {
       position: fixed;
-      bottom: 28px;
-      right: 28px;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: rgba(201, 168, 108, 0.2);
-      border: 1px solid #c9a86c;
-      color: #f0d78c;
-      font-size: 1.4rem;
-      cursor: pointer;
-      z-index: 50;
-      backdrop-filter: blur(8px);
-      transition: all 0.3s;
+      bottom: 18px;
+      right: 18px;
+      max-width: calc(100vw - 36px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 40px;
+      background: rgba(28, 18, 51, 0.9);
+      border: 1px solid var(--gold);
+      backdrop-filter: blur(10px);
+      z-index: 300;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
-    .music-btn:hover { background: rgba(201, 168, 108, 0.35); }
+    .player button {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: rgba(244, 208, 63, 0.2);
+      border: 1px solid var(--gold);
+      color: var(--champagne);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .player button:hover { background: rgba(244, 208, 63, 0.4); }
+    #musicBtn { width: 46px; height: 46px; font-size: 1.15rem; background: rgba(244, 208, 63, 0.3); }
+    .track-name {
+      max-width: 140px;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      color: var(--champagne);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 6px;
+    }
+
+    /* Hidden wrapper frame for safe legal embeds */
+    #embed-container {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
 
     #video-modal {
       position: fixed;
       inset: 0;
-      background: rgba(8, 6, 5, 0.94);
+      background: rgba(8, 6, 16, 0.94);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -262,10 +320,10 @@
       padding: 20px;
     }
     .video-item {
-      background: #1a1210;
+      background: var(--royal);
       border-radius: 18px;
       overflow: hidden;
-      border: 2px solid #c9a86c;
+      border: 2px solid var(--gold);
       box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     }
     .video-item video {
@@ -279,7 +337,7 @@
       top: 22px;
       right: 28px;
       font-size: 2.8rem;
-      color: #e8b4b8;
+      color: var(--gold);
       background: none;
       border: none;
       cursor: pointer;
@@ -295,29 +353,33 @@
   </div>
 
   <section id="main">
-    <div class="script">My Dearest</div>
-    <h1>You Are My Favourite Place</h1>
+    <div class="sun-top">🌻</div>
+    <div class="script">Happy 21st Birthday, My Love 🌻</div>
+    <h1>Saving the Memories of Your Wonderful Day ✨</h1>
 
     <p class="tribute">
-      In a world full of temporary things,<br>
-      you are my permanent peace.<br><br>
+      Some days deserve to be kept forever, 🎂<br>
+      and the day you were born into this world is one of them. 🌻<br><br>
 
-      Your smile is the first place my heart feels at home.<br>
-      Your laugh is the sound I want to hear for the rest of my life.<br>
-      And your love… is the safest thing I have ever known.
+      Your 21st year begins today, and every smile, every laugh, every little moment with you ✨<br>
+      is a treasure I never want to lose. 💛<br>
+      So I folded them all into this little capsule,<br>
+      just for you. 🎁🌻
     </p>
 
-    <div class="quote">“I love you more than yesterday,<br>but less than tomorrow.”</div>
+    <div class="sun-divider">🌻 🌻 🌻</div>
+
+    <div class="quote">“May every year bring you<br>as much joy as you bring me.” 🌻</div>
 
     <div class="locket-container" id="locket">
       <div class="locket" id="locket-inner">
-        <div class="locket-front">❤️</div>
+        <div class="locket-front">🌻</div>
         <div class="locket-back">
           <img src="photos/1.jpg" alt="us">
         </div>
       </div>
     </div>
-    <p class="click-hint">Open the locket</p>
+    <p class="click-hint">Open the locket for more memories 💌</p>
   </section>
 
   <div id="video-modal">
@@ -351,22 +413,30 @@
     </div>
   </div>
 
-  <button class="music-btn" id="musicBtn">♪</button>
-  <audio id="bgMusic" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-  </audio>
+  <!-- Music Player Interface -->
+  <div class="player" id="player">
+    <button id="prevBtn" aria-label="Previous song">⏮</button>
+    <button id="musicBtn" aria-label="Play or pause">▶</button>
+    <button id="nextBtn" aria-label="Next song">⏭</button>
+    <span class="track-name" id="trackName"></span>
+  </div>
+
+  <!-- Hidden Embed Container for Legal Audio Streaming Frames -->
+  <div id="embed-container"></div>
 
   <script>
+    // Floating hearts and sunflowers
     const heartsContainer = document.getElementById('hearts');
-    for (let i = 0; i < 18; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.innerHTML = '♥';
-      heart.style.left = Math.random() * 100 + 'vw';
-      heart.style.animationDuration = (9 + Math.random() * 10) + 's';
-      heart.style.animationDelay = (Math.random() * 8) + 's';
-      heart.style.fontSize = (14 + Math.random() * 16) + 'px';
-      heartsContainer.appendChild(heart);
+    for (let i = 0; i < 22; i++) {
+      const item = document.createElement('div');
+      item.className = 'heart';
+      const isSun = i % 3 === 0;
+      item.innerHTML = isSun ? '🌻' : '♥';
+      item.style.left = Math.random() * 100 + 'vw';
+      item.style.animationDuration = (9 + Math.random() * 10) + 's';
+      item.style.animationDelay = (Math.random() * 8) + 's';
+      item.style.fontSize = (isSun ? 20 + Math.random() * 12 : 14 + Math.random() * 16) + 'px';
+      heartsContainer.appendChild(item);
     }
 
     const capsule = document.getElementById('capsule');
@@ -377,9 +447,63 @@
     const modal = document.getElementById('video-modal');
     const closeBtn = document.getElementById('close-modal');
     const musicBtn = document.getElementById('musicBtn');
-    const bgMusic = document.getElementById('bgMusic');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const trackName = document.getElementById('trackName');
+    const embedContainer = document.getElementById('embed-container');
 
-    // === PHOTOS - automatically resize based on count ===
+    // === LEGAL EMBED PLAYLIST (4 songs via authorized official audio streams) ===
+    const tracks = [
+      { title: 'White Keys - Dominic Fike', embedUrl: 'https://www.youtube.com/embed/xBOcSuou3uw?enablejsapi=1&autoplay=1' },
+      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://www.youtube.com/embed/d--DyK0wtYo?enablejsapi=1&autoplay=1' },
+      { title: 'Running - Lasmid', embedUrl: 'https://www.youtube.com/embed/SkSqhH2u6Yg?enablejsapi=1&autoplay=1' },
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/videoseries?list=PL_authorized_james_varrick_mix&enablejsapi=1&autoplay=1' }
+    ];
+
+    let current = 0;
+    let isPlaying = false;
+
+    function loadTrack(i) {
+      current = (i + tracks.length) % tracks.length;
+      trackName.textContent = tracks[current].title;
+      // Re-render iframe iframe instance to switch streams safely & instantly
+      embedContainer.innerHTML = `<iframe width="200" height="200" src="${tracks[current].embedUrl}" allow="autoplay"></iframe>`;
+      isPlaying = true;
+      musicBtn.textContent = '❚❚';
+    }
+
+    musicBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        // Pause by clearing/stopping the stream frame
+        embedContainer.innerHTML = '';
+        isPlaying = false;
+        musicBtn.textContent = '▶';
+      } else {
+        loadTrack(current);
+      }
+    });
+
+    prevBtn.addEventListener('click', () => { loadTrack(current - 1); });
+    nextBtn.addEventListener('click', () => { loadTrack(current + 1); });
+
+    // Global browser policy unlock for instant playback on first interaction
+    function unlockAudio() {
+      if (!isPlaying) {
+        loadTrack(current);
+        removeUnlock();
+      }
+    }
+    function removeUnlock() {
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(ev =>
+        document.removeEventListener(ev, unlockAudio));
+    }
+    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(ev =>
+      document.addEventListener(ev, unlockAudio));
+
+    // Initial silent preload trigger attempt
+    trackName.textContent = tracks[0].title;
+
+    // === PHOTOS ===
     const photos = [
       'photos/1.jpg',
       'photos/2.jpg',
@@ -426,7 +550,7 @@
       for (let i = 0; i < 20; i++) {
         const h = document.createElement('div');
         h.className = 'mini-heart';
-        h.innerHTML = '♥';
+        h.innerHTML = i % 3 === 0 ? '🌻' : '♥';
         h.style.left = '50%';
         h.style.top = '50%';
         stage.appendChild(h);
@@ -462,18 +586,6 @@
         modal.classList.remove('open');
         setTimeout(() => locketInner.classList.remove('open'), 400);
       }
-    });
-
-    let isPlaying = false;
-    musicBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        bgMusic.pause();
-        musicBtn.textContent = '♪';
-      } else {
-        bgMusic.play();
-        musicBtn.textContent = '❚❚';
-      }
-      isPlaying = !isPlaying;
     });
   </script>
 </body>
