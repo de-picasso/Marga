@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     body {
       font-family: 'Playfair Display', serif;
       background: #0c0a09;
@@ -16,7 +16,6 @@
       min-height: 100vh;
     }
 
-    /* Floating hearts background */
     .hearts {
       position: fixed;
       inset: 0;
@@ -37,7 +36,6 @@
       100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
     }
 
-    /* ========== CAPSULE STAGE ========== */
     #capsule-stage {
       position: fixed;
       inset: 0;
@@ -91,7 +89,6 @@
       box-shadow: none;
     }
 
-    /* Flying photos */
     .photo-fly {
       position: absolute;
       object-fit: cover;
@@ -103,7 +100,6 @@
       transition: all 1.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* Tiny heart particles */
     .mini-heart {
       position: absolute;
       font-size: 16px;
@@ -112,7 +108,6 @@
       pointer-events: none;
     }
 
-    /* ========== MAIN PAGE ========== */
     #main {
       min-height: 100vh;
       padding: 60px 24px 100px;
@@ -166,7 +161,6 @@
       opacity: 0.9;
     }
 
-    /* Locket */
     .locket-container {
       position: relative;
       width: 170px;
@@ -224,7 +218,6 @@
       opacity: 0.7;
     }
 
-    /* Music button */
     .music-btn {
       position: fixed;
       bottom: 28px;
@@ -243,7 +236,6 @@
     }
     .music-btn:hover { background: rgba(201, 168, 108, 0.35); }
 
-    /* Video Modal */
     #video-modal {
       position: fixed;
       inset: 0;
@@ -296,23 +288,20 @@
 </head>
 <body>
 
-  <!-- Floating hearts -->
   <div class="hearts" id="hearts"></div>
 
-  <!-- CAPSULE STAGE -->
   <div id="capsule-stage">
     <div class="capsule" id="capsule"></div>
   </div>
 
-  <!-- MAIN TRIBUTE -->
   <section id="main">
     <div class="script">My Dearest</div>
     <h1>You Are My Favourite Place</h1>
-    
+
     <p class="tribute">
       In a world full of temporary things,<br>
       you are my permanent peace.<br><br>
-      
+
       Your smile is the first place my heart feels at home.<br>
       Your laugh is the sound I want to hear for the rest of my life.<br>
       And your love… is the safest thing I have ever known.
@@ -331,7 +320,6 @@
     <p class="click-hint">Open the locket</p>
   </section>
 
-  <!-- VIDEO MODAL -->
   <div id="video-modal">
     <button class="close-btn" id="close-modal">×</button>
     <div class="video-grid">
@@ -350,18 +338,25 @@
           <source src="videos/3.mp4" type="video/mp4">
         </video>
       </div>
+      <div class="video-item">
+        <video controls poster="photos/4.jpg">
+          <source src="videos/4.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="video-item">
+        <video controls poster="photos/5.jpg">
+          <source src="videos/5.mp4" type="video/mp4">
+        </video>
+      </div>
     </div>
   </div>
 
-  <!-- Music button -->
   <button class="music-btn" id="musicBtn">♪</button>
   <audio id="bgMusic" loop>
     <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    <!-- Replace with a soft romantic track if you want -->
   </audio>
 
   <script>
-    // Create floating background hearts
     const heartsContainer = document.getElementById('hearts');
     for (let i = 0; i < 18; i++) {
       const heart = document.createElement('div');
@@ -393,12 +388,13 @@
       'photos/5.jpg',
       'photos/6.jpg',
       'photos/7.jpg',
-      'photos/8.jpg'
-      // Add as many as you want - they will resize automatically
+      'photos/8.jpg',
+      'photos/9.jpg',
+      'photos/10.jpg'
     ];
 
     const baseSize = 130;
-    const size = Math.max(70, baseSize - (photos.length * 4.5)); // shrinks when more photos
+    const size = Math.max(70, baseSize - (photos.length * 4.5));
 
     photos.forEach((src, i) => {
       const img = document.createElement('img');
@@ -411,7 +407,6 @@
       stage.appendChild(img);
     });
 
-    // Burst animation
     capsule.addEventListener('click', () => {
       capsule.classList.add('burst');
 
@@ -428,7 +423,6 @@
         }, 180 + i * 50);
       });
 
-      // Extra romantic heart particles
       for (let i = 0; i < 20; i++) {
         const h = document.createElement('div');
         h.className = 'mini-heart';
@@ -453,7 +447,6 @@
       }, 1750);
     });
 
-    // Locket
     locket.addEventListener('click', () => {
       locketInner.classList.add('open');
       setTimeout(() => modal.classList.add('open'), 600);
@@ -471,7 +464,6 @@
       }
     });
 
-    // Music toggle
     let isPlaying = false;
     musicBtn.addEventListener('click', () => {
       if (isPlaying) {
@@ -485,4 +477,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
