@@ -466,13 +466,13 @@
     const trackName = document.getElementById('trackName');
     const embedContainer = document.getElementById('embed-container');
 
-    // === 5-SONG PLAYLIST (Legal Direct Embed Streams) ===
+    // === 5-SONG PLAYLIST (SoundCloud Embeds with reliable James Varrick track stream) ===
     const tracks = [
-      { title: 'White Keys - Dominic Fike', embedUrl: 'https://www.youtube.com/embed/xBOcSuou3uw?enablejsapi=1&autoplay=1' },
-      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://www.youtube.com/embed/d--DyK0wtYo?enablejsapi=1&autoplay=1' },
-      { title: 'Running - Lasmid', embedUrl: 'https://www.youtube.com/embed/SkSqhH2u6Yg?enablejsapi=1&autoplay=1' },
-      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://www.youtube.com/embed/aQg5qyVky9U?enablejsapi=1&autoplay=1' },
-      { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&autoplay=1' }
+      { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true' },
+      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true' },
+      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true' },
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true' },
+      { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/29368482&auto_play=true' }
     ];
 
     let current = 0;
@@ -481,7 +481,7 @@
     function loadTrack(i) {
       current = (i + tracks.length) % tracks.length;
       trackName.textContent = tracks[current].title;
-      embedContainer.innerHTML = `<iframe width="200" height="200" src="${tracks[current].embedUrl}" allow="autoplay"></iframe>`;
+      embedContainer.innerHTML = `<iframe width="100" height="100" src="${tracks[current].embedUrl}"></iframe>`;
       isPlaying = true;
       musicBtn.textContent = '❚❚';
     }
