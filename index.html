@@ -103,7 +103,7 @@
       transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .capsule::before { left: 0; border-radius: 40px 0 0 40px; }
-    .capsule::after  { right: 0; border-radius: 0 40px 50px 0; }
+    .capsule::after  { right: 0; border-radius: 0 40px 40px 0; }
 
     .capsule.burst::before {
       transform: translateX(-160px) rotate(-25deg);
@@ -314,7 +314,7 @@
       font-weight: 500;
     }
 
-    /* ===== Player Widget Style ===== */
+    /* ===== Player ===== */
     .player {
       position: fixed;
       bottom: 20px;
@@ -325,7 +325,7 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 30px;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(212, 175, 55, 0.5);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
@@ -359,6 +359,11 @@
       box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85);
     }
     #musicBtn:hover { background: var(--sage); }
+    #musicBtn.nudge { animation: nudgePulse 1.6s ease-in-out infinite; }
+    @keyframes nudgePulse {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85), 0 0 0 0 rgba(244, 208, 63, 0.7); }
+      50%      { box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85), 0 0 0 12px rgba(244, 208, 63, 0); }
+    }
     .track-name {
       max-width: 150px;
       font-size: 0.75rem;
@@ -369,19 +374,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       padding: 0 4px;
-    }
-
-    /* Active SoundCloud Player Iframe Frame Container */
-    #embed-container {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      bottom: 0;
-      right: 0;
-      overflow: hidden;
-      opacity: 0.01; /* Must remain slightly active so browsers don't kill audio execution */
-      pointer-events: none;
-      z-index: 290;
     }
 
     #video-modal {
@@ -437,6 +429,10 @@
       z-index: 2;
     }
     .close-btn:hover { transform: scale(1.1); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .capsule, .locket-front, #musicBtn.nudge { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -514,11 +510,9 @@
     <span class="track-name" id="trackName"></span>
   </div>
 
-  <!-- SoundCloud Widget Container -->
-  <div id="embed-container"></div>
-
+  <audio id="bgm" preload="auto" playsinline></audio>
   <script>
-    // Floating botanical hearts and sunflowers
+    // Floating botanical hearts and sunflowers (every other heart is gold)
     const heartsContainer = document.getElementById('hearts');
     for (let i = 0; i < 22; i++) {
       const item = document.createElement('div');
@@ -547,53 +541,101 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const trackName = document.getElementById('trackName');
-    const embedContainer = document.getElementById('embed-container');
+    const bgm = document.getElementById('bgm');
     const videos = Array.from(document.querySelectorAll('.video-item video'));
 
     // =====================================================
-    // EXACT 4 SONGS PLAYLIST (SoundCloud Embed Streams)
+    // MUSIC: local mp3 files in the "music" folder.
+    // James Varrick plays first; the other songs only start when a song
+    // ends or forward is pressed.
     // =====================================================
     const tracks = [
-      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
-      { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
-      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
-      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' }
+      { title: 'Odo B3n Ni - James Varrick', src: 'music/1.mp3' },
+      { title: 'White Keys - Dominic Fike',  src: 'music/2.mp3' },
+      { title: 'Ocean Eyes - Billie Eilish', src: 'music/3.mp3' },
+      { title: 'Running - Lasmid',           src: 'music/4.mp3' }
     ];
 
     let current = 0;
     let isPlaying = false;
-    let userPaused = false;
+    let started = false;
+    let errorStreak = 0;
+    let modalWasPlaying = false;
 
-    function loadTrack(i) {
-      current = (i + tracks.length) % tracks.length;
-      trackName.textContent = tracks[current].title;
-      embedContainer.innerHTML = `<iframe width="100" height="100" allow="autoplay" src="${tracks[current].embedUrl}"></iframe>`;
-      isPlaying = true;
-      userPaused = false;
-      musicBtn.textContent = '❚❚';
+    // iPhones don't let web pages change volume, so there the music pauses
+    // during videos and resumes afterwards instead of getting quieter.
+    const CAN_DUCK = (() => { const a = new Audio(); a.volume = 0.5; return a.volume === 0.5; })();
+    const VOL_FULL = 100;   // normal
+    const VOL_MODAL = 30;   // video window open, nothing playing
+    const VOL_VIDEO = 10;   // a video is playing
+    let vol = 100, volTarget = 100, fadeTimer = null;
+
+    function setVol(v) {
+      vol = v;
+      if (CAN_DUCK) bgm.volume = Math.max(0, Math.min(1, v / 100));
+    }
+    function fadeTo(t) {
+      if (!CAN_DUCK) return;
+      volTarget = t;
+      clearInterval(fadeTimer);
+      fadeTimer = setInterval(() => {
+        const d = volTarget - vol;
+        if (Math.abs(d) <= 3) { setVol(volTarget); clearInterval(fadeTimer); return; }
+        setVol(vol + Math.sign(d) * 3);
+      }, 40);
+    }
+    function videoPlaying() { return videos.some(v => !v.paused && !v.ended); }
+    function updateDuck() {
+      if (!modal.classList.contains('open') && !locketInner.classList.contains('open')) { fadeTo(VOL_FULL); return; }
+      fadeTo(videoPlaying() ? VOL_VIDEO : VOL_MODAL);
     }
 
-    musicBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        embedContainer.innerHTML = '';
-        isPlaying = false;
-        userPaused = true;
-        musicBtn.textContent = '▶';
-      } else {
-        loadTrack(current);
-      }
+    function setBtn() {
+      musicBtn.innerHTML = isPlaying ? '&#10074;&#10074;' : '&#9658;';
+    }
+
+    function startMusic() {
+      const p = bgm.play();
+      if (p && p.catch) p.catch(() => {}); // blocked: the next tap will try again
+    }
+
+    function goTo(i) {
+      current = (i + tracks.length) % tracks.length;
+      trackName.textContent = tracks[current].title;
+      bgm.src = tracks[current].src;
+      startMusic();
+    }
+
+    bgm.src = tracks[0].src;
+    trackName.textContent = tracks[0].title;
+
+    bgm.addEventListener('play', () => { isPlaying = true; setBtn(); });
+    bgm.addEventListener('pause', () => { isPlaying = false; setBtn(); });
+    bgm.addEventListener('playing', () => { started = true; errorStreak = 0; removeUnlock(); });
+    bgm.addEventListener('ended', () => { goTo(current + 1); }); // song ended -> next song
+    bgm.addEventListener('error', () => {
+      // a missing/unplayable file is skipped (stops if every file fails)
+      errorStreak++;
+      if (errorStreak < tracks.length) goTo(current + 1);
     });
 
-    prevBtn.addEventListener('click', () => { userPaused = false; loadTrack(current - 1); });
-    nextBtn.addEventListener('click', () => { userPaused = false; loadTrack(current + 1); });
+    musicBtn.addEventListener('click', () => {
+      if (isPlaying) bgm.pause(); else startMusic();
+    });
 
-    // Browser policy unlock: Music starts playing the moment she taps the capsule or page
+    prevBtn.addEventListener('click', () => {
+      // James Varrick is first: "previous" restarts it instead of jumping to a locked song
+      if (current === 0) { bgm.currentTime = 0; if (bgm.paused) startMusic(); }
+      else goTo(current - 1);
+    });
+    nextBtn.addEventListener('click', () => { goTo(current + 1); });
+
+    // Browsers (iPhone Safari especially) only allow sound after a real tap.
+    // The capsule tap is that tap; any other first tap/key also starts James Varrick.
     function unlockAudio(e) {
+      if (started) { removeUnlock(); return; }
       if (e && e.target && e.target.closest && e.target.closest('#player')) return;
-      if (!isPlaying && !userPaused) {
-        loadTrack(current);
-        removeUnlock();
-      }
+      startMusic();
     }
     function removeUnlock() {
       ['touchend', 'click', 'keydown'].forEach(ev =>
@@ -602,16 +644,15 @@
     ['touchend', 'click', 'keydown'].forEach(ev =>
       document.addEventListener(ev, unlockAudio));
 
-    trackName.textContent = tracks[0].title;
-
     // =====================================================
-    // PHOTOS & CAPSULE ANIMATION
+    // PHOTOS
     // =====================================================
     const photos = [
       'photos/1.jpg', 'photos/2.jpg', 'photos/3.jpg', 'photos/4.jpg', 'photos/5.jpg',
       'photos/6.jpg', 'photos/7.jpg', 'photos/8.jpg', 'photos/9.jpg', 'photos/10.jpg'
     ];
 
+    // keep the photos a sensible size on small phones
     const baseSize = 120;
     const size = Math.max(56, Math.min(Math.max(70, baseSize - (photos.length * 4)), Math.round(window.innerWidth * 0.24)));
 
@@ -624,28 +665,33 @@
       img.style.height = (size * 1.25) + 'px';
       img.style.left = '50%';
       img.style.top = '50%';
-      img.addEventListener('error', () => img.remove());
+      img.addEventListener('error', () => img.remove()); // missing photo = quietly skipped
       img.src = src;
       stage.appendChild(img);
     });
 
+    // locket photo fallback
     locketImg.addEventListener('error', () => {
       locketImg.remove();
       locketBack.textContent = '🌻';
     });
 
+    // =====================================================
+    // CAPSULE
+    // =====================================================
     capsule.addEventListener('click', () => {
       if (capsule.classList.contains('burst')) return;
       capsule.classList.add('burst');
       capsuleHint.style.opacity = '0';
 
-      // Tap acts as the required browser gesture to start audio
-      if (!isPlaying && !userPaused) { loadTrack(current); removeUnlock(); }
+      // This tap is the user gesture that lets iPhone play sound
+      startMusic();
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const flyPhotos = Array.from(stage.querySelectorAll('.photo-fly')).filter(im => im.naturalWidth > 0);
 
+      // keep every photo inside the screen
       const photoH = size * 1.25;
       const rx = Math.min(330, Math.max(50, vw / 2 - size / 2 - 14));
       const ry = Math.min(300, Math.max(80, vh / 2 - photoH / 2 - 14));
@@ -692,12 +738,19 @@
     });
 
     // =====================================================
-    // LOCKET & VIDEO MODAL
+    // LOCKET + VIDEO MODAL
+    // Music keeps playing softly under the videos (iPhone: pauses, then resumes)
     // =====================================================
     function openModal() {
       if (locketInner.classList.contains('open')) return;
       locketInner.classList.add('open');
       setTimeout(() => modal.classList.add('open'), 500);
+      if (CAN_DUCK) {
+        fadeTo(VOL_MODAL);
+      } else {
+        modalWasPlaying = isPlaying;
+        if (isPlaying) bgm.pause();
+      }
     }
 
     function closeModal() {
@@ -705,6 +758,12 @@
       modal.classList.remove('open');
       videos.forEach(v => v.pause());
       setTimeout(() => locketInner.classList.remove('open'), 350);
+      if (CAN_DUCK) {
+        fadeTo(VOL_FULL);
+      } else {
+        if (modalWasPlaying) startMusic(); // picks up where the song left off
+        modalWasPlaying = false;
+      }
     }
 
     locket.addEventListener('click', openModal);
@@ -712,11 +771,21 @@
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
+    // one video at a time; the music drops very low while a video plays
     modal.addEventListener('play', (e) => {
       if (e.target.tagName !== 'VIDEO') return;
       videos.forEach(v => { if (v !== e.target) v.pause(); });
+      if (CAN_DUCK) updateDuck();
+      else if (isPlaying) { modalWasPlaying = true; bgm.pause(); }
     }, true);
+    ['pause', 'ended'].forEach(ev => {
+      modal.addEventListener(ev, (e) => {
+        if (e.target.tagName !== 'VIDEO') return;
+        setTimeout(updateDuck, 50);
+      }, true);
+    });
 
+    // a video that can't load is hidden instead of showing a broken player
     videoGrid.addEventListener('error', (e) => {
       const t = e.target;
       if (t && (t.tagName === 'SOURCE' || t.tagName === 'VIDEO')) {
