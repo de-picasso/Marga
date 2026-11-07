@@ -103,7 +103,7 @@
       transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .capsule::before { left: 0; border-radius: 40px 0 0 40px; }
-    .capsule::after  { right: 0; border-radius: 0 40px 40px 0; }
+    .capsule::after  { right: 0; border-radius: 0 40px 50px 0; }
 
     .capsule.burst::before {
       transform: translateX(-160px) rotate(-25deg);
@@ -314,7 +314,7 @@
       font-weight: 500;
     }
 
-    /* ===== Player ===== */
+    /* ===== Music Player Widget Style ===== */
     .player {
       position: fixed;
       bottom: 20px;
@@ -325,7 +325,7 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 30px;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(212, 175, 55, 0.5);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
@@ -359,11 +359,6 @@
       box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85);
     }
     #musicBtn:hover { background: var(--sage); }
-    #musicBtn.nudge { animation: nudgePulse 1.6s ease-in-out infinite; }
-    @keyframes nudgePulse {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85), 0 0 0 0 rgba(244, 208, 63, 0.7); }
-      50%      { box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85), 0 0 0 12px rgba(244, 208, 63, 0); }
-    }
     .track-name {
       max-width: 150px;
       font-size: 0.75rem;
@@ -376,10 +371,11 @@
       padding: 0 4px;
     }
 
+    /* Hidden container to hold SoundCloud's official iframe player */
     #embed-container {
       position: absolute;
-      width: 0;
-      height: 0;
+      width: 1px;
+      height: 1px;
       overflow: hidden;
       opacity: 0;
       pointer-events: none;
@@ -438,10 +434,6 @@
       z-index: 2;
     }
     .close-btn:hover { transform: scale(1.1); }
-
-    @media (prefers-reduced-motion: reduce) {
-      .capsule, .locket-front, #musicBtn.nudge { animation: none; }
-    }
   </style>
 </head>
 <body>
@@ -511,7 +503,7 @@
     </div>
   </div>
 
-  <!-- Music Player Interface -->
+  <!-- Music Player Widget Interface -->
   <div class="player" id="player">
     <button id="prevBtn" aria-label="Previous song">&#9664;&#9664;</button>
     <button id="musicBtn" aria-label="Play or pause">&#9658;</button>
@@ -519,12 +511,11 @@
     <span class="track-name" id="trackName"></span>
   </div>
 
+  <!-- Hidden SoundCloud Iframe Widget Container -->
   <div id="embed-container"></div>
 
-  <!-- optional: only used to lower the music under videos and to go to the next song when one ends -->
-  <script async src="https://w.soundcloud.com/player/api.js"></script>
   <script>
-    // Floating botanical hearts and sunflowers (every other heart is gold)
+    // Floating botanical hearts and sunflowers
     const heartsContainer = document.getElementById('hearts');
     for (let i = 0; i < 22; i++) {
       const item = document.createElement('div');
@@ -557,97 +548,47 @@
     const videos = Array.from(document.querySelectorAll('.video-item video'));
 
     // =====================================================
-    // MUSIC: original SoundCloud embeds. James Varrick plays first;
-    // the other songs only start when a song ends or forward is pressed.
+    // SOUNDCLOUD WIDGET PLAYLIST (5 Songs)
     // =====================================================
     const tracks = [
-      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true' },
-      { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true' },
-      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true' },
-      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true' }
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
+      { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
+      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
+      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
+      { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/29368482&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' }
     ];
 
     let current = 0;
     let isPlaying = false;
-    let widget = null;          // optional control of the embed (volume, song-ended); music still plays without it
-    let modalWasPlaying = false;
-
-    // iPhones don't let web pages change media volume, so there the music
-    // pauses during videos and resumes afterwards instead of getting quieter.
-    const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
-                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const VOL_FULL = 100;   // normal
-    const VOL_MODAL = 30;   // video window open, nothing playing
-    const VOL_VIDEO = 10;   // a video is playing
-    let vol = 100, volTarget = 100, fadeTimer = null;
-
-    function setVol(v) {
-      vol = v;
-      if (widget) { try { widget.setVolume(v); } catch (e) {} }
-    }
-    function fadeTo(t) {
-      volTarget = t;
-      clearInterval(fadeTimer);
-      fadeTimer = setInterval(() => {
-        const d = volTarget - vol;
-        if (Math.abs(d) <= 3) { setVol(volTarget); clearInterval(fadeTimer); return; }
-        setVol(vol + Math.sign(d) * 3);
-      }, 40);
-    }
-    function videoPlaying() { return videos.some(v => !v.paused && !v.ended); }
-    function updateDuck() {
-      if (IS_IOS) return;
-      if (!modal.classList.contains('open') && !locketInner.classList.contains('open')) { fadeTo(VOL_FULL); return; }
-      fadeTo(videoPlaying() ? VOL_VIDEO : VOL_MODAL);
-    }
-
-    // attach optional control to the freshly loaded embed (never blocks playback)
-    function hookWidget() {
-      widget = null;
-      const frame = embedContainer.querySelector('iframe');
-      if (!frame) return;
-      frame.addEventListener('load', () => {
-        try {
-          if (typeof SC === 'undefined' || !SC.Widget) return;
-          const w = SC.Widget(frame);
-          widget = w;
-          w.bind(SC.Widget.Events.READY, () => { try { w.setVolume(volTarget); vol = volTarget; } catch (e) {} });
-          w.bind(SC.Widget.Events.FINISH, () => { if (widget === w) loadTrack(current + 1); });
-        } catch (err) {}
-      });
-    }
+    let userPaused = false;
 
     function loadTrack(i) {
       current = (i + tracks.length) % tracks.length;
       trackName.textContent = tracks[current].title;
       embedContainer.innerHTML = `<iframe width="100" height="100" allow="autoplay" src="${tracks[current].embedUrl}"></iframe>`;
       isPlaying = true;
+      userPaused = false;
       musicBtn.textContent = '❚❚';
-      hookWidget();
     }
 
     musicBtn.addEventListener('click', () => {
       if (isPlaying) {
         embedContainer.innerHTML = '';
-        widget = null;
         isPlaying = false;
+        userPaused = true;
         musicBtn.textContent = '▶';
       } else {
         loadTrack(current);
       }
     });
 
-    prevBtn.addEventListener('click', () => {
-      // James Varrick is first: "previous" restarts it instead of jumping to a locked song
-      loadTrack(current === 0 ? 0 : current - 1);
-    });
+    prevBtn.addEventListener('click', () => { loadTrack(current - 1); });
     nextBtn.addEventListener('click', () => { loadTrack(current + 1); });
 
-    // Browser policy unlock: James Varrick starts on the first tap/key press
-    // (touchend/click count as real taps on iPhone)
+    // Browser policy unlock: Music starts playing the moment she taps the capsule or page
     function unlockAudio(e) {
       if (e && e.target && e.target.closest && e.target.closest('#player')) return;
-      if (!isPlaying) {
+      if (!isPlaying && !userPaused) {
         loadTrack(current);
         removeUnlock();
       }
@@ -662,14 +603,13 @@
     trackName.textContent = tracks[0].title;
 
     // =====================================================
-    // PHOTOS
+    // PHOTOS & CAPSULE ANIMATION
     // =====================================================
     const photos = [
       'photos/1.jpg', 'photos/2.jpg', 'photos/3.jpg', 'photos/4.jpg', 'photos/5.jpg',
       'photos/6.jpg', 'photos/7.jpg', 'photos/8.jpg', 'photos/9.jpg', 'photos/10.jpg'
     ];
 
-    // keep the photos a sensible size on small phones
     const baseSize = 120;
     const size = Math.max(56, Math.min(Math.max(70, baseSize - (photos.length * 4)), Math.round(window.innerWidth * 0.24)));
 
@@ -682,33 +622,28 @@
       img.style.height = (size * 1.25) + 'px';
       img.style.left = '50%';
       img.style.top = '50%';
-      img.addEventListener('error', () => img.remove()); // missing photo = quietly skipped
+      img.addEventListener('error', () => img.remove());
       img.src = src;
       stage.appendChild(img);
     });
 
-    // locket photo fallback
     locketImg.addEventListener('error', () => {
       locketImg.remove();
       locketBack.textContent = '🌻';
     });
 
-    // =====================================================
-    // CAPSULE
-    // =====================================================
     capsule.addEventListener('click', () => {
       if (capsule.classList.contains('burst')) return;
       capsule.classList.add('burst');
       capsuleHint.style.opacity = '0';
 
-      // This tap is the user gesture that lets iPhone play sound
-      if (!isPlaying) { loadTrack(current); removeUnlock(); }
+      // Tap acts as the required browser gesture to start audio
+      if (!isPlaying && !userPaused) { loadTrack(current); removeUnlock(); }
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const flyPhotos = Array.from(stage.querySelectorAll('.photo-fly')).filter(im => im.naturalWidth > 0);
 
-      // keep every photo inside the screen
       const photoH = size * 1.25;
       const rx = Math.min(330, Math.max(50, vw / 2 - size / 2 - 14));
       const ry = Math.min(300, Math.max(80, vh / 2 - photoH / 2 - 14));
@@ -755,19 +690,12 @@
     });
 
     // =====================================================
-    // LOCKET + VIDEO MODAL
-    // Music keeps playing softly under the videos (iPhone: pauses, then resumes)
+    // LOCKET & VIDEO MODAL
     // =====================================================
     function openModal() {
       if (locketInner.classList.contains('open')) return;
       locketInner.classList.add('open');
       setTimeout(() => modal.classList.add('open'), 500);
-      if (IS_IOS) {
-        modalWasPlaying = isPlaying && !!widget;
-        if (modalWasPlaying) { try { widget.pause(); } catch (e) {} }
-      } else {
-        fadeTo(VOL_MODAL);
-      }
     }
 
     function closeModal() {
@@ -775,12 +703,6 @@
       modal.classList.remove('open');
       videos.forEach(v => v.pause());
       setTimeout(() => locketInner.classList.remove('open'), 350);
-      if (IS_IOS) {
-        if (modalWasPlaying && widget) { try { widget.play(); } catch (e) {} }
-        modalWasPlaying = false;
-      } else {
-        fadeTo(VOL_FULL);
-      }
     }
 
     locket.addEventListener('click', openModal);
@@ -788,21 +710,12 @@
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    // one video at a time; the music drops very low while a video plays
+    // Ensure only one video plays at a time
     modal.addEventListener('play', (e) => {
       if (e.target.tagName !== 'VIDEO') return;
       videos.forEach(v => { if (v !== e.target) v.pause(); });
-      if (IS_IOS) { if (isPlaying && widget) { try { widget.pause(); modalWasPlaying = true; } catch (err) {} } }
-      else updateDuck();
     }, true);
-    ['pause', 'ended'].forEach(ev => {
-      modal.addEventListener(ev, (e) => {
-        if (e.target.tagName !== 'VIDEO') return;
-        setTimeout(updateDuck, 50);
-      }, true);
-    });
 
-    // a video that can't load is hidden instead of showing a broken player
     videoGrid.addEventListener('error', (e) => {
       const t = e.target;
       if (t && (t.tagName === 'SOURCE' || t.tagName === 'VIDEO')) {
