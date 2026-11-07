@@ -314,7 +314,7 @@
       font-weight: 500;
     }
 
-    /* ===== Music Player Widget Style ===== */
+    /* ===== Player Widget Style ===== */
     .player {
       position: fixed;
       bottom: 20px;
@@ -325,7 +325,7 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 30px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(212, 175, 55, 0.5);
       -webkit-backdrop-filter: blur(12px);
       backdrop-filter: blur(12px);
@@ -371,14 +371,17 @@
       padding: 0 4px;
     }
 
-    /* Hidden container to hold SoundCloud's official iframe player */
+    /* Active SoundCloud Player Iframe Frame Container */
     #embed-container {
       position: absolute;
-      width: 1px;
-      height: 1px;
+      width: 80px;
+      height: 80px;
+      bottom: 0;
+      right: 0;
       overflow: hidden;
-      opacity: 0;
+      opacity: 0.01; /* Must remain slightly active so browsers don't kill audio execution */
       pointer-events: none;
+      z-index: 290;
     }
 
     #video-modal {
@@ -503,7 +506,7 @@
     </div>
   </div>
 
-  <!-- Music Player Widget Interface -->
+  <!-- Music Player Interface -->
   <div class="player" id="player">
     <button id="prevBtn" aria-label="Previous song">&#9664;&#9664;</button>
     <button id="musicBtn" aria-label="Play or pause">&#9658;</button>
@@ -511,7 +514,7 @@
     <span class="track-name" id="trackName"></span>
   </div>
 
-  <!-- Hidden SoundCloud Iframe Widget Container -->
+  <!-- SoundCloud Widget Container -->
   <div id="embed-container"></div>
 
   <script>
@@ -548,14 +551,13 @@
     const videos = Array.from(document.querySelectorAll('.video-item video'));
 
     // =====================================================
-    // SOUNDCLOUD WIDGET PLAYLIST (5 Songs)
+    // EXACT 4 SONGS PLAYLIST (SoundCloud Embed Streams)
     // =====================================================
     const tracks = [
       { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
       { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
       { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
-      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' },
-      { title: 'Bonus Track 5 - Favorite Song', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/29368482&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' }
+      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false' }
     ];
 
     let current = 0;
@@ -582,8 +584,8 @@
       }
     });
 
-    prevBtn.addEventListener('click', () => { loadTrack(current - 1); });
-    nextBtn.addEventListener('click', () => { loadTrack(current + 1); });
+    prevBtn.addEventListener('click', () => { userPaused = false; loadTrack(current - 1); });
+    nextBtn.addEventListener('click', () => { userPaused = false; loadTrack(current + 1); });
 
     // Browser policy unlock: Music starts playing the moment she taps the capsule or page
     function unlockAudio(e) {
@@ -710,7 +712,6 @@
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    // Ensure only one video plays at a time
     modal.addEventListener('play', (e) => {
       if (e.target.tagName !== 'VIDEO') return;
       videos.forEach(v => { if (v !== e.target) v.pause(); });
