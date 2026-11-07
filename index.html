@@ -247,13 +247,6 @@
       color: var(--forest);
       margin: 1rem 0 2.5rem;
       opacity: 0.9;
-      line-height: 1.7;
-    }
-    .quote span {
-      background: linear-gradient(transparent 62%, rgba(244, 208, 63, 0.35) 62%);
-      padding: 0 4px;
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
     }
 
     .locket-container {
@@ -383,46 +376,14 @@
       padding: 0 4px;
     }
 
-    /* SoundCloud engine: hidden by default, shown only if the browser blocks autoplay */
-    #sc-frame {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100px;
-      height: 100px;
-      border: 0;
-      opacity: 0.01;
+    #embed-container {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
       pointer-events: none;
-      z-index: 1;
     }
-    #sc-frame.visible {
-      left: auto;
-      right: 20px;
-      bottom: 78px;
-      width: min(300px, calc(100vw - 40px));
-      height: 100px;
-      opacity: 1;
-      pointer-events: auto;
-      z-index: 310;
-      border-radius: 14px;
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.85), 0 12px 30px rgba(27, 67, 50, 0.2);
-    }
-    #tap-hint {
-      position: fixed;
-      right: 20px;
-      bottom: 188px;
-      max-width: calc(100vw - 40px);
-      padding: 8px 14px;
-      border-radius: 14px;
-      background: #fffbea;
-      border: 1px solid rgba(212, 175, 55, 0.6);
-      color: var(--forest);
-      font-size: 0.8rem;
-      font-weight: 500;
-      z-index: 310;
-      display: none;
-    }
-    #tap-hint.show { display: block; }
 
     #video-modal {
       position: fixed;
@@ -506,7 +467,7 @@
 
     <div class="sun-divider">🌻 🌻 🌻</div>
 
-    <div class="quote"><span>“May every year bring you as much joy as you bring me.”</span></div>
+    <div class="quote">“May every year bring you as much joy as you bring me.”</div>
 
     <div class="locket-container" id="locket">
       <div class="locket" id="locket-inner">
@@ -551,9 +512,6 @@
   </div>
 
   <!-- Music Player Interface -->
-  <div id="tap-hint">Tap ▶ below to start our music 🎵</div>
-  <iframe id="sc-frame" title="Music" allow="autoplay" scrolling="no" frameborder="no"></iframe>
-
   <div class="player" id="player">
     <button id="prevBtn" aria-label="Previous song">&#9664;&#9664;</button>
     <button id="musicBtn" aria-label="Play or pause">&#9658;</button>
@@ -561,7 +519,10 @@
     <span class="track-name" id="trackName"></span>
   </div>
 
-  <script src="https://w.soundcloud.com/player/api.js"></script>
+  <div id="embed-container"></div>
+
+  <!-- optional: only used to lower the music under videos and to go to the next song when one ends -->
+  <script async src="https://w.soundcloud.com/player/api.js"></script>
   <script>
     // Floating botanical hearts and sunflowers (every other heart is gold)
     const heartsContainer = document.getElementById('hearts');
@@ -592,66 +553,45 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const trackName = document.getElementById('trackName');
-    const scFrame = document.getElementById('sc-frame');
-    const tapHint = document.getElementById('tap-hint');
+    const embedContainer = document.getElementById('embed-container');
     const videos = Array.from(document.querySelectorAll('.video-item video'));
 
     // =====================================================
-    // MUSIC: SoundCloud Widget API (one hidden player, real pause, auto-next)
-    // James Varrick plays first. The other songs only start when the
-    // current song ends or the user presses forward.
+    // MUSIC: original SoundCloud embeds. James Varrick plays first;
+    // the other songs only start when a song ends or forward is pressed.
     // =====================================================
     const tracks = [
-      { title: 'Odo B3n Ni - James Varrick', url: 'https://api.soundcloud.com/tracks/581577903' },
-      { title: 'White Keys - Dominic Fike',  url: 'https://api.soundcloud.com/tracks/1580210085' },
-      { title: 'Ocean Eyes - Billie Eilish', url: 'https://api.soundcloud.com/tracks/238127357' },
-      { title: 'Running - Lasmid',           url: 'https://api.soundcloud.com/tracks/1400000000' }
+      { title: 'Odo B3n Ni - James Varrick', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/581577903&auto_play=true' },
+      { title: 'White Keys - Dominic Fike', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1580210085&auto_play=true' },
+      { title: 'Ocean Eyes - Billie Eilish', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/238127357&auto_play=true' },
+      { title: 'Running - Lasmid', embedUrl: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1400000000&auto_play=true' }
     ];
 
-    const SC_OPTS = {
-      hide_related: true, show_comments: false, show_user: true, show_reposts: false,
-      show_teaser: false, visual: false, show_artwork: false, buying: false,
-      sharing: false, download: false, liking: false, show_playcount: false
-    };
-
-    function scSrc(url) {
-      const q = Object.keys(SC_OPTS).map(k => k + '=' + SC_OPTS[k]).join('&');
-      return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&' + q;
-    }
-
-    let widget = null;
-    let ready = false;
-    let pendingPlay = false;
-    let started = false;       // true once any song has actually played
-    let isPlaying = false;     // always mirrors the real player state
     let current = 0;
-    let errorStreak = 0;
-    let lastFinish = 0;
-    let fallbackTimer = null;
-    let nudgeTimer = null;
+    let isPlaying = false;
+    let widget = null;          // optional control of the embed (volume, song-ended); music still plays without it
     let modalWasPlaying = false;
 
-    // ---- Background-music ducking: the song stays on, but softly, under the videos ----
-    // iPhones don't allow web pages to change media volume, so there the music
-    // pauses during videos and resumes afterwards instead.
+    // iPhones don't let web pages change media volume, so there the music
+    // pauses during videos and resumes afterwards instead of getting quieter.
     const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const VOL_FULL = 100;   // normal
-    const VOL_MODAL = 30;   // video window open, no video playing
+    const VOL_MODAL = 30;   // video window open, nothing playing
     const VOL_VIDEO = 10;   // a video is playing
-    let volNow = 100, volTarget = 100, fadeTimer = null;
+    let vol = 100, volTarget = 100, fadeTimer = null;
 
     function setVol(v) {
-      volNow = v;
-      if (widget && ready) widget.setVolume(v);
+      vol = v;
+      if (widget) { try { widget.setVolume(v); } catch (e) {} }
     }
-    function fadeTo(target) {
-      volTarget = target;
+    function fadeTo(t) {
+      volTarget = t;
       clearInterval(fadeTimer);
       fadeTimer = setInterval(() => {
-        const d = volTarget - volNow;
+        const d = volTarget - vol;
         if (Math.abs(d) <= 3) { setVol(volTarget); clearInterval(fadeTimer); return; }
-        setVol(volNow + Math.sign(d) * 3);
+        setVol(vol + Math.sign(d) * 3);
       }, 40);
     }
     function videoPlaying() { return videos.some(v => !v.paused && !v.ended); }
@@ -661,122 +601,56 @@
       fadeTo(videoPlaying() ? VOL_VIDEO : VOL_MODAL);
     }
 
-    trackName.textContent = tracks[0].title;
-
-    function setBtn() {
-      musicBtn.innerHTML = isPlaying ? '&#10074;&#10074;' : '&#9658;';
+    // attach optional control to the freshly loaded embed (never blocks playback)
+    function hookWidget() {
+      widget = null;
+      const frame = embedContainer.querySelector('iframe');
+      if (!frame) return;
+      frame.addEventListener('load', () => {
+        try {
+          if (typeof SC === 'undefined' || !SC.Widget) return;
+          const w = SC.Widget(frame);
+          widget = w;
+          w.bind(SC.Widget.Events.READY, () => { try { w.setVolume(volTarget); vol = volTarget; } catch (e) {} });
+          w.bind(SC.Widget.Events.FINISH, () => { if (widget === w) loadTrack(current + 1); });
+        } catch (err) {}
+      });
     }
 
-    function hideFallback() {
-      scFrame.classList.remove('visible');
-      tapHint.classList.remove('show');
-      musicBtn.classList.remove('nudge');
-    }
-
-    function showFallback() {
-      // Browser blocked autoplay: reveal the real SoundCloud play button so one tap on it starts the music
-      if (started) return;
-      scFrame.classList.add('visible');
-      tapHint.classList.add('show');
-      musicBtn.classList.add('nudge');
-    }
-
-    function startMusic(fromGesture) {
-      if (!widget) return;
-      if (ready) widget.play(); else pendingPlay = true;
-      if (fromGesture && !fallbackTimer && !started) {
-        fallbackTimer = setTimeout(() => { if (!started) showFallback(); }, 2800);
-      }
-    }
-
-    function goTo(i) {
+    function loadTrack(i) {
       current = (i + tracks.length) % tracks.length;
       trackName.textContent = tracks[current].title;
-      if (!widget) return;
-      widget.load(tracks[current].url, Object.assign({ auto_play: true }, SC_OPTS));
-      clearTimeout(nudgeTimer);
-      nudgeTimer = setTimeout(() => {
-        // If the browser refused to continue on its own, gently highlight the play button
-        if (!isPlaying && !modal.classList.contains('open')) musicBtn.classList.add('nudge');
-      }, 4500);
-    }
-
-    if (typeof SC !== 'undefined' && SC.Widget) {
-      scFrame.src = scSrc(tracks[0].url);
-      widget = SC.Widget(scFrame);
-
-      widget.bind(SC.Widget.Events.READY, () => {
-        const firstReady = !ready;
-        ready = true;
-        if (firstReady || pendingPlay) {
-          pendingPlay = false;
-          widget.play(); // works instantly where autoplay is allowed; harmlessly ignored where it is not
-        }
-      });
-
-      widget.bind(SC.Widget.Events.PLAY, () => {
-        started = true;
-        isPlaying = true;
-        errorStreak = 0;
-        clearTimeout(fallbackTimer);
-        clearTimeout(nudgeTimer);
-        hideFallback();
-        removeUnlock();
-        setBtn();
-        // a new song may reset its volume, so re-apply the right level
-        if (IS_IOS) {
-          if (modal.classList.contains('open')) videos.forEach(v => v.pause());
-        } else {
-          setVol(volNow);
-          updateDuck();
-        }
-      });
-
-      widget.bind(SC.Widget.Events.PAUSE, () => {
-        isPlaying = false;
-        setBtn();
-      });
-
-      widget.bind(SC.Widget.Events.FINISH, () => {
-        const now = Date.now();
-        if (now - lastFinish < 1500) return;
-        lastFinish = now;
-        isPlaying = false;
-        setBtn();
-        goTo(current + 1); // song ended -> next song
-      });
-
-      widget.bind(SC.Widget.Events.ERROR, () => {
-        // a track that fails to load is skipped (stops if every track fails)
-        errorStreak++;
-        if (errorStreak < tracks.length) goTo(current + 1);
-      });
+      embedContainer.innerHTML = `<iframe width="100" height="100" allow="autoplay" src="${tracks[current].embedUrl}"></iframe>`;
+      isPlaying = true;
+      musicBtn.textContent = '❚❚';
+      hookWidget();
     }
 
     musicBtn.addEventListener('click', () => {
-      if (!widget) return;
-      if (isPlaying) widget.pause(); else widget.play();
-    });
-
-    nextBtn.addEventListener('click', () => { goTo(current + 1); });
-
-    prevBtn.addEventListener('click', () => {
-      if (!widget) return;
-      if (current === 0) {
-        // James Varrick is first: "previous" restarts it instead of jumping to a locked song
-        widget.seekTo(0);
-        if (!isPlaying) widget.play();
+      if (isPlaying) {
+        embedContainer.innerHTML = '';
+        widget = null;
+        isPlaying = false;
+        musicBtn.textContent = '▶';
       } else {
-        goTo(current - 1);
+        loadTrack(current);
       }
     });
 
-    // iPhone/Safari only allows sound after a real tap. The capsule tap is that tap,
-    // and any other first tap/keypress also starts James Varrick.
+    prevBtn.addEventListener('click', () => {
+      // James Varrick is first: "previous" restarts it instead of jumping to a locked song
+      loadTrack(current === 0 ? 0 : current - 1);
+    });
+    nextBtn.addEventListener('click', () => { loadTrack(current + 1); });
+
+    // Browser policy unlock: James Varrick starts on the first tap/key press
+    // (touchend/click count as real taps on iPhone)
     function unlockAudio(e) {
-      if (started) { removeUnlock(); return; }
-      if (e && e.target && e.target.closest && e.target.closest('#player, #sc-frame')) return;
-      startMusic(true);
+      if (e && e.target && e.target.closest && e.target.closest('#player')) return;
+      if (!isPlaying) {
+        loadTrack(current);
+        removeUnlock();
+      }
     }
     function removeUnlock() {
       ['touchend', 'click', 'keydown'].forEach(ev =>
@@ -784,6 +658,8 @@
     }
     ['touchend', 'click', 'keydown'].forEach(ev =>
       document.addEventListener(ev, unlockAudio));
+
+    trackName.textContent = tracks[0].title;
 
     // =====================================================
     // PHOTOS
@@ -826,7 +702,7 @@
       capsuleHint.style.opacity = '0';
 
       // This tap is the user gesture that lets iPhone play sound
-      startMusic(true);
+      if (!isPlaying) { loadTrack(current); removeUnlock(); }
 
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -879,17 +755,18 @@
     });
 
     // =====================================================
-    // LOCKET + VIDEO MODAL (music and videos never overlap)
+    // LOCKET + VIDEO MODAL
+    // Music keeps playing softly under the videos (iPhone: pauses, then resumes)
     // =====================================================
     function openModal() {
       if (locketInner.classList.contains('open')) return;
       locketInner.classList.add('open');
       setTimeout(() => modal.classList.add('open'), 500);
       if (IS_IOS) {
-        modalWasPlaying = isPlaying;
-        if (isPlaying && widget) widget.pause();
+        modalWasPlaying = isPlaying && !!widget;
+        if (modalWasPlaying) { try { widget.pause(); } catch (e) {} }
       } else {
-        fadeTo(VOL_MODAL); // music keeps going, just softer
+        fadeTo(VOL_MODAL);
       }
     }
 
@@ -899,10 +776,10 @@
       videos.forEach(v => v.pause());
       setTimeout(() => locketInner.classList.remove('open'), 350);
       if (IS_IOS) {
-        if (modalWasPlaying && widget && !isPlaying) widget.play(); // resume the song
+        if (modalWasPlaying && widget) { try { widget.play(); } catch (e) {} }
         modalWasPlaying = false;
       } else {
-        fadeTo(VOL_FULL); // bring the music back to full volume
+        fadeTo(VOL_FULL);
       }
     }
 
@@ -911,18 +788,17 @@
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    // one video at a time; the music drops very low while a video plays and
-    // rises to a soft level when the video pauses or ends (never muted)
+    // one video at a time; the music drops very low while a video plays
     modal.addEventListener('play', (e) => {
       if (e.target.tagName !== 'VIDEO') return;
       videos.forEach(v => { if (v !== e.target) v.pause(); });
-      if (IS_IOS) { if (isPlaying && widget) widget.pause(); }
+      if (IS_IOS) { if (isPlaying && widget) { try { widget.pause(); modalWasPlaying = true; } catch (err) {} } }
       else updateDuck();
     }, true);
     ['pause', 'ended'].forEach(ev => {
       modal.addEventListener(ev, (e) => {
         if (e.target.tagName !== 'VIDEO') return;
-        setTimeout(updateDuck, 50); // lets a video-to-video switch settle first
+        setTimeout(updateDuck, 50);
       }, true);
     });
 
@@ -936,4 +812,4 @@
     }, true);
   </script>
 </body>
-  </html>
+</html>
